@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
-	
+	"time"
+
 	"net/http"
+
 	
+	"github.com/pearlMat/bookee/internal/data"
 )
 
 func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,5 +22,20 @@ func (app *application) showBookHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	fmt.Fprintf(w, "show the details of a book %d\n", id)
+	book := data.Book{
+		ID: id,
+
+		CreatedAt: time.Now(),
+		Author:    "James Conn",
+		Title:     "Casablanca",
+		Genres:    []string{"drama", "romance", "war"},
+		Version:   1,
+	}
+
+	err = app.writeJSON(w, http.StatusOK, book, nil)
+	if err != nil {
+		app.logger.Error(err.Error())
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
+
 }
