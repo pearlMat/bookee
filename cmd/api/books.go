@@ -2,17 +2,32 @@ package main
 
 import (
 	//"encoding/json"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"net/http"
 
-	
 	"github.com/pearlMat/bookee/internal/data"
 )
 
 func (app *application) createBookHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "create a new book")
+	var input struct {
+		Title  string   `json:"title"`
+		Author string   `json:"author"`
+		Isbn   int32    `json:"isbn"`
+		Year   int32    `json:"year,omitempty"`
+		Genres []string `json:"genres,omitempty"`
+
+		Version int32
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+	fmt.Fprintf(w, "%+v\n", input)
 }
 
 func (app *application) showBookHandler(w http.ResponseWriter, r *http.Request) {
